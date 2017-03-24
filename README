@@ -1,0 +1,11 @@
+DESCRIPTION DU DEPOT
+
+Depot pour gestion d'une banque de cours comme dans le devoir 1, mais
+en Ruby.
+
+Contient le squelette de script, de la class Cours et du module
+Motifs, ainsi que tests unitaires et fonctionnels pour le devoir 2 en
+INF600A.
+
+Guy Tremblay, Hiver 2017
+
