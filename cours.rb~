@@ -52,9 +52,9 @@ class Cours
                     @prealables.join(separateur_prealables))
     else
       chaine_formatee = le_format
-	    chaine_formatee = chaine_formatee.gsub("%S", @sigle.to_s)
-	    chaine_formatee = chaine_formatee.gsub("%T", @titre.to_s)
-	    chaine_formatee = chaine_formatee.gsub("%C", @nb_credits.to_s)
+	    chaine_formatee.gsub("%S", @sigle.to_s)
+	    chaine_formatee.gsub("%T", @titre.to_s)
+	    chaine_formatee.gsub("%C", @nb_credits.to_s)
 	    return chaine_formatee.gsub("%P", @prealables.join(CoursTexte::SEPARATEUR_PREALABLES).to_s)
 	  end
 
