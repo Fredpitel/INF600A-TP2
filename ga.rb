@@ -92,7 +92,7 @@ def init( depot )
   detruire = valider_option(/^--detruire$/, ARGV[0])
 
   if File.exists? depot
-	  if detruire == true
+	  if detruire
       FileUtils.rm_f depot # On detruit le depot existant si --detruire est specifie.
     else
       erreur "Le fichier '#{depot}' existe.
@@ -137,7 +137,17 @@ end
 #################################################################
 
 def lister( les_cours )
-  [les_cours, nil] # A MODIFIER/COMPLETER!
+  inactif = valider_option(/^--avec_inactifs/, ARGV[0])
+  format = valider_option(/^--format=/, ARGV[0])
+  separateur_prealables = valider_option(/^--separateur_prealables=/, ARGV[0])
+
+  les_cours = les_cours.select { |cours| cours.actif? } unless inactif
+
+  resultat = les_cours.map { |cours| cours.to_s(format, separateur_prealables) }
+  resultat = resultat.sort { |x, y| x <=> y }
+  resultat = resultat.join("\n") << "\n" unless resultat.empty?
+
+  [les_cours, resultat.empty? ? nil : resultat]
 end
 
 def ajouter( les_cours )
@@ -171,6 +181,7 @@ end
 #######################################################
 # Fonctions secondaires
 #######################################################
+
 def valider_option( attendu, obtenu )
 	if attendu =~ obtenu
 	  ARGV.shift

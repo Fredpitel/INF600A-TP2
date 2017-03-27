@@ -57,6 +57,9 @@ class Cours
     fail "Cas non traite: to_s( #{le_format}, #{separateur_prealables} )"
   end
   
+  #
+  # Formate la chaine selon le format donne
+  #
   def formater_chaine(le_format, separateur_prealables)
     chaine_formatee = le_format
 
@@ -68,7 +71,10 @@ class Cours
     
     return chaine_formatee
   end
-
+  
+  #
+  # Retourne l'attribut associe au template ou leve un exception si inexistant
+  #
   def get_attribut(match, separateur_prealables)
     return case match[-1]
       when "S"
