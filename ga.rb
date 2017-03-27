@@ -144,10 +144,15 @@ def lister( les_cours )
   les_cours = les_cours.select { |cours| cours.actif? } unless inactif
 
   resultat = les_cours.map { |cours| cours.to_s(format, separateur_prealables) }
-  resultat = resultat.sort { |x, y| x <=> y }
-  resultat = resultat.join("\n") << "\n" unless resultat.empty?
 
-  [les_cours, resultat.empty? ? nil : resultat]
+  if resultat.empty?
+    resultat = nil
+  else
+    resultat = resultat.sort { |x, y| x <=> y }
+    resultat = resultat.join("\n") << "\n"
+  end
+
+  [les_cours, resultat]
 end
 
 def ajouter( les_cours )
