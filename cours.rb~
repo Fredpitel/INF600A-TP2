@@ -56,7 +56,7 @@ class Cours
 
     fail "Cas non traite: to_s( #{le_format}, #{separateur_prealables} )"
   end
-
+  
   def formater_chaine(le_format, separateur_prealables)
     chaine_formatee = le_format
 
@@ -82,9 +82,7 @@ class Cours
       when "A"
         @actif? CoursTexte::ACTIF : CoursTexte::INACTIF
       else
-        raise ArgumentError.new()
-        STDERR.puts "*** Erreur: Valeur de champ non valide: #{match}"
-        STDERR.puts
+        raise ArgumentError
       end
   end
 

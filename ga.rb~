@@ -171,6 +171,13 @@ end
 #######################################################
 # Fonctions secondaires
 #######################################################
+def valider_option_avec_param( attendu, obtenu )
+  param = (/=/.match obtenu).post_match if attendu =~ obtenu
+  ARGV.shift if !param.nil?  
+  
+  param
+end
+
 def valider_option( attendu, obtenu )
 	if attendu =~ obtenu
 	  ARGV.shift

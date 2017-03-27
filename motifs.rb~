@@ -10,11 +10,11 @@ module Motifs
   #   %r{...}
   #   /.../
 
-  SIGLE =  %r{\b[A-Z]{3}[0-9]{3}[A-Z0-9]\b}
-  TITRE = %r{\b[a-zA-Z]+\b}
-  NOMBRE = %r{\b[0-9]+\b}
-  PREALABLES = %r{\b(SIGLECoursTexte::SEPARATEUR_PREALABLES)*SIGLE\b}
+  SIGLE =  /\b[A-Z]{3}[0-9]{4}\b/
+  TITRE = /\b[\w\s]+\b/
+  NOMBRE = /\b[0-9]+\b/
+  PREALABLES = /\b(#{SIGLE} *)+\b/
 
   # Motif pour un cours complet
-  COURS = %r{\bSIGLECoursTexte::SEP TITRECoursTexte::SEP NOMBRECoursTexte::SEP (PREALABLES)*\b}
+  COURS = /^#{SIGLE} +('|")#{TITRE}('|") +#{NOMBRE}( +#{PREALABLES})?/
 end
