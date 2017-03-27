@@ -141,16 +141,10 @@ def lister( les_cours )
   format = valider_option(/^--format=/, ARGV[0])
   separateur_prealables = valider_option(/^--separateur_prealables=/, ARGV[0])
 
-  les_cours = les_cours.select { |cours| cours.actif? } unless inactif
+  liste_cours = inactif==true ? les_cours : les_cours.select { |cours| cours.actif? }
 
-  resultat = les_cours.map { |cours| cours.to_s(format, separateur_prealables) }
-
-  if resultat.empty?
-    resultat = nil
-  else
-    resultat = resultat.sort { |x, y| x <=> y }
-    resultat = resultat.join("\n") << "\n"
-  end
+  resultat = liste_cours.map { |cours| cours.to_s(format, separateur_prealables) }
+  resultat = resultat.empty? ? nil : resultat.sort{ |x, y| x <=> y }.join("\n") << "\n"
 
   [les_cours, resultat]
 end
