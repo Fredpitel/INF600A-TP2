@@ -16,5 +16,5 @@ module Motifs
   PREALABLES = /^([A-Z]{3}[0-9]{4} *)+$/
 
   # Motif pour un cours complet
-  COURS = /^[A-Z]{3}[0-9]{4} +('|").+('|") +[\d]+( +([A-Z]{3}[0-9]{4} *)+)?$/
+  COURS = /^[A-Z]{3}[0-9]{4} +('|").+('|") +[\d]+( +[A-Z]{3}[0-9]{4})*$/
 end
