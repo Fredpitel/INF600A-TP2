@@ -51,16 +51,40 @@ class Cours
                     @titre,
                     @prealables.join(separateur_prealables))
     else
-      chaine_formatee = le_format
-	    chaine_formatee = chaine_formatee.gsub("%S", @sigle.to_s)
-	    chaine_formatee = chaine_formatee.gsub("%T", @titre.to_s)
-	    chaine_formatee = chaine_formatee.gsub("%C", @nb_credits.to_s)
-	    return chaine_formatee.gsub("%P", @prealables.join(CoursTexte::SEPARATEUR_PREALABLES).to_s)
+      return formater_chaine(le_format, separateur_prealables)
 	  end
 
     fail "Cas non traite: to_s( #{le_format}, #{separateur_prealables} )"
   end
 
+  def formater_chaine(le_format, separateur_prealables)
+    chaine_formatee = le_format
+
+    while !(match = (/%(\.|-)?[0-9]*./.match chaine_formatee).to_s).empty?
+      valeur = get_attribut(match[-1], separateur_prealables)
+      valeur_formatee = format(match.sub(match[-1], "s"), valeur)
+      chaine_formatee = chaine_formatee.gsub(match, valeur_formatee)
+    end
+    
+    return chaine_formatee
+  end
+
+  def get_attribut(match, separateur_prealables)
+    return case match[-1]
+      when "S"
+        @sigle.to_s
+      when "T"
+        @titre.to_s
+      when "C"
+        @nb_credits.to_s
+      when "P"
+        @prealables.join(separateur_prealables).to_s
+      when "A"
+        @actif? CoursTexte::ACTIF : CoursTexte::INACTIF
+      else
+        raise ArgumentError
+      end
+  end
 
   #
   # Ordonne les cours selon le sigle.
