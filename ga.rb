@@ -83,16 +83,15 @@ end
 ###################################################
 
 def definir_depot
-  depot = valider_option(/^--depot=/, ARGV[0])
-  depot ||= DEPOT_DEFAUT
-  depot
+  options = get_options([:depot])
+  options[:depot] ||= DEPOT_DEFAUT
 end
 
 def init( depot )
-  detruire = valider_option(/^--detruire$/, ARGV[0])
+  options = get_options([:detruire])
 
   if File.exists? depot
-	  if detruire
+	  if options[:detruire]
       FileUtils.rm_f depot # On detruit le depot existant si --detruire est specifie.
     else
       erreur "Le fichier '#{depot}' existe.
@@ -136,20 +135,18 @@ end
 # Les fonctions pour les diverses commandes de l'application.
 #################################################################
 
-def lister( les_cours )
-  inactif = valider_option(/^--avec_inactifs/, ARGV[0])
-  format = valider_option(/^--format=/, ARGV[0])
-  separateur_prealables = valider_option(/^--separateur_prealables=/, ARGV[0])
+def lister( les_cours )  
+  options = get_options( [:avec_inactifs, :format, :separateur_prealables] )
+  options[:separateur_prealables] ||= CoursTexte::SEPARATEUR_PREALABLES
 
-  liste_cours = inactif==true ? les_cours : les_cours.select { |cours| cours.actif? }
-
-  resultat = liste_cours.map { |cours| cours.to_s(format, separateur_prealables) }
-  resultat = resultat.empty? ? nil : resultat.sort{ |x, y| x <=> y }.join("\n") << "\n"
-
+  liste_cours = options[:avec_inactifs] ? les_cours : les_cours.select { |cours| cours.actif? }
+  resultat = liste_cours.empty? ? nil : formater_resultat(liste_cours, options)
+  
   [les_cours, resultat]
 end
 
 def ajouter( les_cours )
+  
   [les_cours, nil] # A MODIFIER/COMPLETER!
 end
 
@@ -180,17 +177,23 @@ end
 #######################################################
 # Fonctions secondaires
 #######################################################
+def get_options( sym )
+  Hash[ sym.map { |sym| [sym, valider_option(/^--#{sym.to_s}/, ARGV[0])] }]
+end
 
 def valider_option( attendu, obtenu )
 	if attendu =~ obtenu
 	  ARGV.shift
     match = /=/.match obtenu
-    return match.nil? ? true : match.post_match
+    match.nil? ? true : match.post_match
+  else
+    nil
   end
-	
-  nil
 end
 
+def formater_resultat(liste_cours, options)
+  liste_cours.map { |cours| cours.to_s(options[:format], options[:separateur_prealables]) }.sort{ |a, b| a <=> b }.join("\n") << "\n"
+end
 #######################################################
 # Les differentes commandes possibles.
 #######################################################

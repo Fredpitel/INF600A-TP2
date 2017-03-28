@@ -42,8 +42,9 @@ class Cours
   # Des indications de largeur, justification, etc. peuvent aussi etre
   # specifiees, par exemple, %-10T, %-.10T, etc.
   #
-  def to_s( le_format = nil, separateur_prealables = CoursTexte::SEPARATEUR_PREALABLES )
+  def to_s( le_format = nil, separateur_prealables = nil )
     # Format simple par defaut, pour les cas de tests de base.a
+    separateur_prealables ||= CoursTexte::SEPARATEUR_PREALABLES
     if le_format.nil?
       return format("%s%s \"%-10s\" (%s)",
                     @sigle,
