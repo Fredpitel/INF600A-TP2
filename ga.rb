@@ -164,7 +164,15 @@ def nb_credits( les_cours )
 end
 
 def supprimer( les_cours )
-  [les_cours, nil] # A MODIFIER/COMPLETER!
+  if ARGV.empty?
+    ARGF.each { |ligne|
+      ligne.scan(/\w+/).map { |sigle| les_cours.delete(get_cours(sigle, les_cours)) } unless ligne.strip.chomp.empty?
+    }
+  else
+    les_cours.delete(get_cours(ARGV.shift, les_cours))
+  end
+
+  [les_cours, nil]
 end
 
 def trouver( les_cours )
@@ -233,6 +241,7 @@ def valider_cours(cours, les_cours)
 end
 
 def get_cours(sigle, les_cours)
+  erreur "Format de sigle incorrect: #{sigle}" unless sigle =~ Motifs::SIGLE
   cours = les_cours.find { |cours| cours.sigle.to_s == sigle  }
   erreur "Aucun cours: #{sigle}" unless cours
   cours
