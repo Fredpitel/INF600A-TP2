@@ -28,7 +28,7 @@ PGM=./ga.rb
 # Constantes/cibles a modifier selon votre avancement (exemple, test)
 # et selon la commande en cours de developpement.
 
-WIP=ajouter
+WIP=nb_credits
 #WIP=motifs
 
 #NIVEAU_TEST=NIVEAU=base ruby

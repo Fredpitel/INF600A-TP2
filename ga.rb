@@ -147,24 +147,20 @@ end
 
 def ajouter( les_cours )
   if ARGV.empty?
-    ARGF.each { |ligne|
-      unless ligne.strip.chomp.empty?
-        params = get_params(ligne.scan(/[\"\'].*[\"\']|[^\s]+/).map { |p| p.gsub(/^[\'\"]|[\'\"]$/, "") })
-        cours = CoursTexte.creer_cours(params << ",#{CoursTexte::ACTIF}")
-        les_cours << cours if valider_cours(cours, les_cours)
-      end
+    ARGF.each { |ligne| 
+      les_cours << creer_cours(ligne.scan(/(?<=[\"\']).*(?=[\"\'])|[^\s\'\"]+/), les_cours) unless ligne.strip.chomp.empty? 
     }
   else
-    params = get_params(ARGV)
-    cours = CoursTexte.creer_cours(params << ",#{CoursTexte::ACTIF}")
-    les_cours << cours if valider_cours(cours, les_cours)
+    les_cours << creer_cours(ARGV, les_cours)
   end
 
   [les_cours, nil]
 end
 
 def nb_credits( les_cours )
-  [les_cours, nil] # A MODIFIER/COMPLETER!
+  total = ARGV.empty? ? 0 : ARGV.map { |sigle| get_cours(sigle, les_cours).nb_credits.to_i }.reduce(:+)
+  ARGV.clear
+  [les_cours, total.to_s << "\n"]
 end
 
 def supprimer( les_cours )
@@ -176,14 +172,14 @@ def trouver( les_cours )
 end
 
 def desactiver( les_cours )
-  cours_choisi = les_cours.select { |cours| cours.sigle == ARGV.shift }
-  erreur "Le cours est deja inactif" unless cours.actif?
-  les_cours = les_cours.map { |cours| cours.sigle == cours_choisi.sigle ? cours.activer : cours }
+  get_cours(ARGV.shift, les_cours).desactiver
 
-  [les_cours, nil] # A MODIFIER/COMPLETER!
+  [les_cours, nil]
 end
 
 def reactiver( les_cours )
+  get_cours(ARGV.shift, les_cours).activer
+
   [les_cours, nil]
 end
 
@@ -196,13 +192,6 @@ end
 #######################################################
 def get_options( sym )
   Hash[ sym.map { |sym| [sym, valider_option(/^--#{sym.to_s}/, ARGV[0])] } ]
-end
-
-def get_params(data_cours)
-  params = data_cours.shift(3)
-  params << (data_cours.empty? ? nil : data_cours.join(':'))
-  data_cours.clear
-  return params.join(',')
 end
 
 def valider_option( attendu, obtenu )
@@ -221,22 +210,34 @@ def formater_resultat(liste_cours, options)
              .join("\n") << "\n"
 end
 
+def creer_cours(data_cours, les_cours)
+  cours = CoursTexte.creer_cours(get_params(data_cours) << ",#{CoursTexte::ACTIF}")
+  valider_cours(cours, les_cours)
+end
+
+def get_params(data_cours)
+  params = data_cours.shift(3)
+  params << (data_cours.empty? ? nil : data_cours.join(':'))
+  data_cours.clear
+  return params.join(',')
+end
+
 def valider_cours(cours, les_cours)
   erreur "Sigle de motif incorect." unless cours.sigle =~ Motifs::SIGLE
-  erreur "Un cours avec le meme sigle existe deja." if les_cours.any? { |cours_liste| (cours_liste <=> cours) == 0 }
+  erreur "Un cours avec le meme sigle existe deja." if les_cours.include? cours
   cours.prealables.each { |pre|
     erreur "Prealable invalide car Sigle incorrect." unless Motifs::SIGLE =~ pre
-    erreur "Prealable invalide car inexistant: #{pre}" if (les_cours.select { |liste_cours| (liste_cours.sigle == pre && liste_cours.actif?) }).empty?
+    erreur "Prealable invalide car inexistant ou inactif: #{pre}" unless les_cours.any? { |cours| (cours.sigle == pre && cours.actif?) }
   }
-  true
+  cours
 end
 
-
-
-
-def get_cours(sigle)
-  
+def get_cours(sigle, les_cours)
+  cours = les_cours.find { |cours| cours.sigle.to_s == sigle  }
+  erreur "Aucun cours: #{sigle}" unless cours
+  cours
 end
+
 #######################################################
 # Les differentes commandes possibles.
 #######################################################
