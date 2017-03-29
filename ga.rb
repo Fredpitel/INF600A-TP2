@@ -136,18 +136,31 @@ end
 #################################################################
 
 def lister( les_cours )  
-  options = get_options( [:avec_inactifs, :format, :separateur_prealables] )
+  options = get_options([:avec_inactifs, :format, :separateur_prealables])
   options[:separateur_prealables] ||= CoursTexte::SEPARATEUR_PREALABLES
 
   liste_cours = options[:avec_inactifs] ? les_cours : les_cours.select { |cours| cours.actif? }
   resultat = liste_cours.empty? ? nil : formater_resultat(liste_cours, options)
-  
+
   [les_cours, resultat]
 end
 
 def ajouter( les_cours )
-  
-  [les_cours, nil] # A MODIFIER/COMPLETER!
+  if ARGV.empty?
+    ARGF.each { |ligne|
+      unless ligne.strip.chomp.empty?
+        params = get_params(ligne.scan(/[\"\'].*[\"\']|[^\s]+/).map { |p| p.gsub(/^[\'\"]|[\'\"]$/, "") })
+        cours = CoursTexte.creer_cours(params << ",#{CoursTexte::ACTIF}")
+        les_cours << cours if valider_cours(cours, les_cours)
+      end
+    }
+  else
+    params = get_params(ARGV)
+    cours = CoursTexte.creer_cours(params << ",#{CoursTexte::ACTIF}")
+    les_cours << cours if valider_cours(cours, les_cours)
+  end
+
+  [les_cours, nil]
 end
 
 def nb_credits( les_cours )
@@ -163,6 +176,10 @@ def trouver( les_cours )
 end
 
 def desactiver( les_cours )
+  cours_choisi = les_cours.select { |cours| cours.sigle == ARGV.shift }
+  erreur "Le cours est deja inactif" unless cours.actif?
+  les_cours = les_cours.map { |cours| cours.sigle == cours_choisi.sigle ? cours.activer : cours }
+
   [les_cours, nil] # A MODIFIER/COMPLETER!
 end
 
@@ -178,7 +195,14 @@ end
 # Fonctions secondaires
 #######################################################
 def get_options( sym )
-  Hash[ sym.map { |sym| [sym, valider_option(/^--#{sym.to_s}/, ARGV[0])] }]
+  Hash[ sym.map { |sym| [sym, valider_option(/^--#{sym.to_s}/, ARGV[0])] } ]
+end
+
+def get_params(data_cours)
+  params = data_cours.shift(3)
+  params << (data_cours.empty? ? nil : data_cours.join(':'))
+  data_cours.clear
+  return params.join(',')
 end
 
 def valider_option( attendu, obtenu )
@@ -192,7 +216,26 @@ def valider_option( attendu, obtenu )
 end
 
 def formater_resultat(liste_cours, options)
-  liste_cours.map { |cours| cours.to_s(options[:format], options[:separateur_prealables]) }.sort{ |a, b| a <=> b }.join("\n") << "\n"
+  liste_cours.map { |cours| cours.to_s(options[:format], options[:separateur_prealables]) }
+             .sort{ |a, b| a <=> b }
+             .join("\n") << "\n"
+end
+
+def valider_cours(cours, les_cours)
+  erreur "Sigle de motif incorect." unless cours.sigle =~ Motifs::SIGLE
+  erreur "Un cours avec le meme sigle existe deja." if les_cours.any? { |cours_liste| (cours_liste <=> cours) == 0 }
+  cours.prealables.each { |pre|
+    erreur "Prealable invalide car Sigle incorrect." unless Motifs::SIGLE =~ pre
+    erreur "Prealable invalide car inexistant: #{pre}" if (les_cours.select { |liste_cours| (liste_cours.sigle == pre && liste_cours.actif?) }).empty?
+  }
+  true
+end
+
+
+
+
+def get_cours(sigle)
+  
 end
 #######################################################
 # Les differentes commandes possibles.
