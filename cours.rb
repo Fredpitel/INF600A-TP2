@@ -17,13 +17,13 @@ class Cours
   attr_accessor :actif
 
   def initialize( sigle, titre, nb_credits, *prealables, actif: true )
-    DBC.require( sigle.kind_of?(Symbol) && /^#{Motifs::SIGLE}$/ =~ sigle,
+    DBC.require( sigle.kind_of?(Symbol) && Motifs::SIGLE =~ sigle,
                  "Sigle incorrect: #{sigle}!?" )
     DBC.require( !titre.strip.empty?,
                  "Titre vide: '#{titre}'" )
     DBC.require( nb_credits.to_i > 0,
                  "Nb. credits invalides: #{nb_credits}!?" )
-	  DBC.require( prealables.map {|p| /^#{Motifs::PREALABLES}$/ =~ p} ,
+	  DBC.require( prealables.each {|p| p.kind_of?(Symbol) && Motifs::PREALABLES =~ p }, 
 				         "Prealables incorrects: #{prealables}!?" )
     DBC.require( actif.kind_of?(TrueClass) || actif.kind_of?(FalseClass),
                  "Actif incorrect, doit etre true ou false: #{actif}!?" )
@@ -64,9 +64,8 @@ class Cours
     chaine_formatee = le_format
 
     while !(match = (/%(\.|-)?[0-9]*./.match chaine_formatee).to_s).empty?
-      valeur = get_attribut(match[-1], separateur_prealables)
-      valeur_formatee = format(match.sub(match[-1], "s"), valeur)
-      chaine_formatee = chaine_formatee.gsub(match, valeur_formatee)
+      valeur = format(match.sub(match[-1], "s"), get_attribut(match[-1], separateur_prealables))
+      chaine_formatee = chaine_formatee.gsub(match, valeur)
     end
     
     return chaine_formatee

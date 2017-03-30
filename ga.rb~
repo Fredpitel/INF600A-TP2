@@ -202,10 +202,10 @@ def prealables( les_cours )
   options = get_options([:tous])
   cours = get_cours(ARGV.shift, les_cours)
 
-  #prealables = []
+  prealables = []
 
   if options[:tous] && !cours.prealables.empty?
-      cours.prealables.each { |pre| get_prealables(pre.to_s, les_cours, prealables) }
+      cours.prealables.map { |pre| get_prealables(pre.to_s, les_cours, prealables) }
   else
       prealables = cours.prealables
   end 
@@ -247,7 +247,7 @@ def formater_resultat(liste_cours, options)
 end
 
 def creer_cours(data_cours, les_cours)
-  cours = CoursTexte.creer_cours(get_params(data_cours) << ",#{CoursTexte::ACTIF}")
+  cours = CoursTexte.creer_cours(get_params(data_cours))
   valider_cours(cours, les_cours)
 end
 
@@ -255,7 +255,7 @@ def get_params(data_cours)
   params = data_cours.shift(3)
   params << (data_cours.empty? ? nil : data_cours.join(':'))
   data_cours.clear
-  return params.join(',')
+  params.join(',') << ",#{CoursTexte::ACTIF}"
 end
 
 def valider_cours(cours, les_cours)
