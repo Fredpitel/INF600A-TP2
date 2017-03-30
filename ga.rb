@@ -137,7 +137,6 @@ end
 
 def lister( les_cours )  
   options = get_options([:avec_inactifs, :format, :separateur_prealables])
-  options[:separateur_prealables] ||= CoursTexte::SEPARATEUR_PREALABLES
 
   liste_cours = options[:avec_inactifs] ? les_cours : les_cours.select { |cours| cours.actif? }
   resultat = liste_cours.empty? ? nil : formater_resultat(liste_cours, options)
@@ -176,7 +175,15 @@ def supprimer( les_cours )
 end
 
 def trouver( les_cours )
-  [les_cours, nil] # A MODIFIER/COMPLETER!
+  options = get_options([:avec_inactifs, :cle_tri, :format])
+
+  liste_cours = options[:avec_inactifs] ? les_cours : les_cours.select { |cours| cours.actif? }
+  liste_cours = liste_cours.select { |cours| /#{ARGV[0]}/i =~ cours.to_s }
+  ARGV.shift
+
+  resultat = liste_cours.empty? ? nil : formater_resultat(liste_cours, options)
+
+  [les_cours, resultat]
 end
 
 def desactiver( les_cours )
@@ -192,8 +199,29 @@ def reactiver( les_cours )
 end
 
 def prealables( les_cours )
-  [les_cours, nil] # A MODIFIER/COMPLETER!
+  options = get_options([:tous])
+  cours = get_cours(ARGV.shift, les_cours)
+
+  prealables = []
+
+  if options[:tous] && !cours.prealables.empty?
+      cours.prealables.each { |pre| get_prealables(pre.to_s, les_cours, prealables) }
+  else
+      prealables = cours.prealables
+  end 
+
+  resultat = prealables.empty? ? nil : prealables.uniq.sort.join("\n") << "\n"
+
+  [les_cours, resultat]
 end
+
+def get_prealables ( sigle, les_cours, prealables )
+  cours = get_cours( sigle, les_cours )
+  prealables << cours.sigle.to_s
+  
+  cours.prealables.empty? ? prealables : cours.prealables.map { |pre| get_prealables(pre.to_s, les_cours, prealables) }
+end
+
 
 #######################################################
 # Fonctions secondaires
@@ -213,9 +241,10 @@ def valider_option( attendu, obtenu )
 end
 
 def formater_resultat(liste_cours, options)
-  liste_cours.map { |cours| cours.to_s(options[:format], options[:separateur_prealables]) }
-             .sort{ |a, b| a <=> b }
-             .join("\n") << "\n"
+  options[:separateur_prealables] ||= CoursTexte::SEPARATEUR_PREALABLES
+
+  liste_triee = options[:cle_tri] == "titre" ? liste_cours.sort_by(&:titre) : liste_cours.sort_by(&:sigle)
+  liste_triee.map { |cours| cours.to_s(options[:format], options[:separateur_prealables]) }.join("\n") << "\n"
 end
 
 def creer_cours(data_cours, les_cours)

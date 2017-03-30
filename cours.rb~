@@ -13,7 +13,7 @@ class Cours
   attr_reader :sigle
   attr_reader :titre
   attr_reader :nb_credits
-  attr_reader :prealables
+  attr_accessor :prealables
   attr_accessor :actif
 
   def initialize( sigle, titre, nb_credits, *prealables, actif: true )
@@ -103,7 +103,7 @@ class Cours
   # Rend un cours inactif.
   #
   def desactiver
-    DBC.require( actif?, "Cours pas actif: #{self}" )
+    DBC.require( actif?, "Cours deja inactif: #{self}" )
 
     @actif = false
     self

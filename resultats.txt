@@ -1,0 +1,81 @@
+++ RESULTATS DES TESTS ++
+-- ruby Tests/ajouter_test.rb
+Run options: --seed 60793
+
+# Running:
+
+................
+
+Finished in 1.343545s, 11.9088 runs/s, 66.2427 assertions/s.
+
+16 runs, 89 assertions, 0 failures, 0 errors, 0 skips
+-- ruby Tests/desactiver_reactiver_test.rb
+Run options: --seed 46909
+
+# Running:
+
+......
+
+Finished in 0.617498s, 9.7166 runs/s, 71.2553 assertions/s.
+
+6 runs, 44 assertions, 0 failures, 0 errors, 0 skips
+-- ruby Tests/init_test.rb
+Run options: --seed 51207
+
+# Running:
+
+........
+
+Finished in 0.629464s, 12.7092 runs/s, 76.2554 assertions/s.
+
+8 runs, 48 assertions, 0 failures, 0 errors, 0 skips
+-- ruby Tests/lister_test.rb
+Run options: --seed 51840
+
+# Running:
+
+.........
+
+Finished in 0.883870s, 10.1825 runs/s, 44.1241 assertions/s.
+
+9 runs, 39 assertions, 0 failures, 0 errors, 0 skips
+-- ruby Tests/nb_credits_test.rb
+Run options: --seed 4223
+
+# Running:
+
+...
+
+Finished in 0.341465s, 8.7857 runs/s, 38.0712 assertions/s.
+
+3 runs, 13 assertions, 0 failures, 0 errors, 0 skips
+-- ruby Tests/prealables_test.rb
+Run options: --seed 34729
+
+# Running:
+
+......
+
+Finished in 0.671115s, 8.9403 runs/s, 40.2315 assertions/s.
+
+6 runs, 27 assertions, 0 failures, 0 errors, 0 skips
+-- ruby Tests/supprimer_test.rb
+Run options: --seed 49374
+
+# Running:
+
+......
+
+Finished in 0.576865s, 10.4011 runs/s, 62.4063 assertions/s.
+
+6 runs, 36 assertions, 0 failures, 0 errors, 0 skips
+-- ruby Tests/trouver_test.rb
+Run options: --seed 5564
+
+# Running:
+
+..........
+
+Finished in 0.890621s, 11.2281 runs/s, 47.1581 assertions/s.
+
+10 runs, 42 assertions, 0 failures, 0 errors, 0 skips
