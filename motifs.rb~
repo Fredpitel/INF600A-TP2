@@ -10,11 +10,16 @@ module Motifs
   #   %r{...}
   #   /.../
 
-  SIGLE =  /^[A-Z]{3}[0-9]{3}[A-Z0-9]$/
-  TITRE = /^.+$/
-  NOMBRE = /^[\d]+$/
-  PREALABLES = /^(#{SIGLE.to_s} *)+$/
+  SIGLE_STR = "[A-Z]{3}[0-9]{3}[A-Z0-9]"
+  TITRE_STR = ".+"
+  NOMBRE_STR =  '[\d]+'
+  PREALABLES_STR = "( *#{SIGLE_STR})+"
+
+  SIGLE =  /^#{SIGLE_STR}$/
+  TITRE = /^#{TITRE_STR}$/
+  NOMBRE = /^#{NOMBRE_STR}$/
+  PREALABLES = /^#{PREALABLES_STR}$/
 
   # Motif pour un cours complet
-  COURS = /^[A-Z]{3}[0-9]{4} +('|").+('|") +[\d]+( +[A-Z]{3}[0-9]{4})*$/
+  COURS = /^#{SIGLE_STR} +('|")#{TITRE_STR}('|") +#{NOMBRE_STR}#{PREALABLES_STR}$/
 end

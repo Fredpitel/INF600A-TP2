@@ -222,7 +222,6 @@ def get_prealables ( sigle, les_cours, prealables )
   cours.prealables.empty? ? prealables : cours.prealables.map { |pre| get_prealables(pre.to_s, les_cours, prealables) }
 end
 
-
 #######################################################
 # Fonctions secondaires
 #######################################################

@@ -202,7 +202,7 @@ def prealables( les_cours )
   options = get_options([:tous])
   cours = get_cours(ARGV.shift, les_cours)
 
-  prealables = cours.prealables.clone
+  #prealables = []
 
   if options[:tous] && !cours.prealables.empty?
       cours.prealables.each { |pre| get_prealables(pre.to_s, les_cours, prealables) }
@@ -221,7 +221,6 @@ def get_prealables ( sigle, les_cours, prealables )
   
   cours.prealables.empty? ? prealables : cours.prealables.map { |pre| get_prealables(pre.to_s, les_cours, prealables) }
 end
-
 
 #######################################################
 # Fonctions secondaires
