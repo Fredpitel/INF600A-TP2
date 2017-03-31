@@ -202,24 +202,22 @@ def prealables( les_cours )
   options = get_options([:tous])
   cours = get_cours(ARGV.shift, les_cours)
 
-  prealables = []
-
   if options[:tous] && !cours.prealables.empty?
-      cours.prealables.map { |pre| get_prealables(pre.to_s, les_cours, prealables) }
-  else
-      prealables = cours.prealables
-  end 
+    prealables = get_prealables(cours.prealables, les_cours)
+  else 
+    prealables = cours.prealables
+  end
 
-  resultat = prealables.empty? ? nil : prealables.uniq.sort.join("\n") << "\n"
+  resultat = prealables.empty? ? nil : prealables.flatten.uniq.sort.join("\n") << "\n"
 
   [les_cours, resultat]
 end
 
-def get_prealables ( sigle, les_cours, prealables )
-  cours = get_cours( sigle, les_cours )
-  prealables << cours.sigle.to_s
-  
-  cours.prealables.empty? ? prealables : cours.prealables.map { |pre| get_prealables(pre.to_s, les_cours, prealables) }
+def get_prealables ( prealables, les_cours )
+  prealables.map { |pre|
+    cours = get_cours( pre.to_s, les_cours )
+    cours.prealables.empty? ? pre : get_prealables(cours.prealables, les_cours) << pre
+  }
 end
 
 #######################################################
