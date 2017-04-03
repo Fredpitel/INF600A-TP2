@@ -214,11 +214,9 @@ def get_prealables ( prealables, les_cours )
   }
 end
 
-####################################################################################################
-#
-#                                       Fonctions secondaires
-#
-####################################################################################################
+#############################################################
+# Fonctions secondaires
+#############################################################
 
 # Fonction get_options
 # Params: liste de symboles representants les options possibles
@@ -234,9 +232,10 @@ end
 #
 # Retourne le resultat de la comparaison entre ARGV[0] et une regex representant l'option attendue
 #
-# valeurs possibles: nil (pas l'option attendue)
-#                    true (option attendue sans parametre ex: --detruire
-#                    string (option attendue avec parametre ex: --depot=.foo.txt retourne ".foo.txt"
+# valeurs de retour possibles: 
+#   -nil (pas l'option attendue)
+#   -true (option attendue sans parametre ex: --detruire)
+#   -string (option attendue avec parametre ex: --depot=.foo.txt retourne ".foo.txt")
 
 def valider_option( attendu, obtenu )
 	if attendu =~ obtenu
