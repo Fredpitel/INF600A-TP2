@@ -17,6 +17,7 @@ class Cours
   attr_accessor :actif
 
   def initialize( sigle, titre, nb_credits, *prealables, actif: true )
+    puts sigle.to_s << titre << nb_credits << prealables[0].to_s
     DBC.require( sigle.kind_of?(Symbol) && Motifs::SIGLE =~ sigle,
                  "Sigle incorrect: #{sigle}!?" )
     DBC.require( !titre.strip.empty?,
@@ -52,7 +53,7 @@ class Cours
                     @prealables.join(separateur_prealables))
     else
       return formater_chaine(le_format, separateur_prealables)
-	  end
+    end
 
     fail "Cas non traite: to_s( #{le_format}, #{separateur_prealables} )"
   end

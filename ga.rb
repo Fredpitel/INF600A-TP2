@@ -156,9 +156,9 @@ def ajouter( les_cours )
 end
 
 def nb_credits( les_cours )
-  total = (ARGV.empty? ? 0 : ARGV.map { |sigle| get_cours(sigle, les_cours).nb_credits }.reduce(:+))
-          .to_s << "\n"
+  total = (ARGV.empty? ? 0 : ARGV.map { |sigle| get_cours(sigle, les_cours).nb_credits }.reduce(:+)).to_s << "\n"
   ARGV.clear
+
   [les_cours, total]
 end
 
@@ -299,7 +299,7 @@ def valider_cours(cours, les_cours)
   erreur "Un cours avec le meme sigle existe deja." if les_cours.include? cours
   cours.prealables.each { |pre|
     erreur "Prealable invalide car Sigle incorrect." unless Motifs::SIGLE =~ pre
-    erreur "Prealable invalide car inexistant: #{pre}" unless les_cours.any? { |cours| cours.sigle == pre && cours.actif? }
+    erreur "Prealable invalide car inexistant ou inactif: #{pre}" unless les_cours.any? { |cours| cours.sigle == pre && cours.actif? }
   }
   cours
 end
