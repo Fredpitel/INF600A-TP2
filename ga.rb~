@@ -139,9 +139,8 @@ def lister( les_cours )
   options = get_options([:avec_inactifs, :format, :separateur_prealables])
 
   liste_cours = options[:avec_inactifs] ? les_cours : les_cours.select { |cours| cours.actif? }
-  resultat = liste_cours.empty? ? nil : cours_to_s(liste_cours, options)
 
-  [les_cours, resultat]
+  [les_cours, formater_cours(liste_cours, options)]
 end
 
 def ajouter( les_cours )
@@ -157,10 +156,10 @@ def ajouter( les_cours )
 end
 
 def nb_credits( les_cours )
-  resultat = (ARGV.empty? ? 0 : ARGV.map { |sigle| get_cours(sigle, les_cours).nb_credits }.reduce(:+))
-             .to_s << "\n"
+  total = (ARGV.empty? ? 0 : ARGV.map { |sigle| get_cours(sigle, les_cours).nb_credits }.reduce(:+))
+          .to_s << "\n"
   ARGV.clear
-  [les_cours, resultat]
+  [les_cours, total]
 end
 
 def supprimer( les_cours )
@@ -180,9 +179,7 @@ def trouver( les_cours )
                 .select { |cours| /#{ARGV[0]}/i =~ cours.to_s }
   ARGV.shift
 
-  resultat = cours_to_s(liste_cours, options)
-
-  [les_cours, resultat]
+  [les_cours, formater_cours(liste_cours, options)]
 end
 
 def desactiver( les_cours )
@@ -203,9 +200,7 @@ def prealables( les_cours )
 
   prealables = options[:tous] ? get_prealables(cours.prealables, les_cours) : cours.prealables
 
-  resultat = formater_resultat(prealables)
-
-  [les_cours, resultat]
+  [les_cours, formater_liste(prealables)]
 end
 
 # Fonction get_prealables
@@ -251,26 +246,26 @@ def valider_option( attendu, obtenu )
   end
 end
 
-# Fonction cours_to_s
+# Fonction formater_cours
 # Params: liste des Cours a afficher, hash representant les options specifiees
 #
 # Retourne l'information des Cours a afficher sur stdout formatee selon les options specifiees
 
-def cours_to_s( liste_cours, options )
+def formater_cours( liste_cours, options )
   options[:separateur_prealables] ||= CoursTexte::SEPARATEUR_PREALABLES
 
-  formater_resultat(
-    (options[:cle_tri] == "titre" ? liste_cours.sort_by(&:titre) : liste_cours.sort_by(&:sigle))
+  formater_liste(
+    (options[:cle_tri] == "titre" ? liste_cours.sort_by(&:titre) : liste_cours.sort)
     .map { |cours| cours.to_s(options[:format], options[:separateur_prealables]) }
   )
 end 
 
-# Fonction formater_resultat
+# Fonction formater_liste
 # Params liste
 #
 # Retourne la liste formatee pour etre affichee sur stdout
 
-def formater_resultat(liste)
+def formater_liste(liste)
   liste.empty? ? nil : liste.join("\n") << "\n"
 end
 
@@ -318,7 +313,7 @@ def get_cours(sigle, les_cours)
   erreur "Format de sigle incorrect: #{sigle}" unless sigle =~ Motifs::SIGLE
   cours = les_cours.find { |cours| cours.sigle.to_s == sigle  }
   erreur "Aucun cours: #{sigle}" unless cours
-  cours
+  #cours
 end
 
 #######################################################
