@@ -63,7 +63,7 @@ class Cours
   def formater_chaine(le_format, separateur_prealables)
     chaine_formatee = le_format
 
-    while !(match = (/%(\.|-)?[0-9]*./.match chaine_formatee).to_s).empty?
+    while !(match = (/%-?\.?[0-9]*./.match chaine_formatee).to_s).empty?
       valeur = format(match.sub(match[-1], "s"), get_attribut(match[-1], separateur_prealables))
       chaine_formatee = chaine_formatee.gsub(match, valeur)
     end
