@@ -158,6 +158,7 @@ end
 def nb_credits( les_cours )
   total = (ARGV.empty? ? 0 : ARGV.map { |sigle| get_cours(sigle, les_cours).nb_credits }.reduce(:+)).to_s << "\n"
   ARGV.clear
+
   [les_cours, total]
 end
 
@@ -238,8 +239,7 @@ end
 def valider_option( attendu, obtenu )
 	if attendu =~ obtenu
 	  ARGV.shift
-    match = /=/.match obtenu
-    match.nil? ? true : match.post_match
+    (match = /=/.match obtenu).nil? ? true : match.post_match
   else
     nil
   end

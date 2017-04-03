@@ -17,7 +17,6 @@ class Cours
   attr_accessor :actif
 
   def initialize( sigle, titre, nb_credits, *prealables, actif: true )
-    puts sigle.to_s << titre << nb_credits << prealables[0].to_s
     DBC.require( sigle.kind_of?(Symbol) && Motifs::SIGLE =~ sigle,
                  "Sigle incorrect: #{sigle}!?" )
     DBC.require( !titre.strip.empty?,
@@ -106,7 +105,7 @@ class Cours
     DBC.require( actif?, "Cours deja inactif: #{self}" )
 
     @actif = false
-    self
+    #self
   end
 
   #
@@ -116,7 +115,7 @@ class Cours
     DBC.require( !actif?, "Cours deja actif: #{self}" )
 
     @actif = true
-    self
+    #self
   end
 
   #

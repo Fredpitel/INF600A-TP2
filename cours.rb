@@ -105,7 +105,6 @@ class Cours
     DBC.require( actif?, "Cours deja inactif: #{self}" )
 
     @actif = false
-    self
   end
 
   #
@@ -115,7 +114,6 @@ class Cours
     DBC.require( !actif?, "Cours deja actif: #{self}" )
 
     @actif = true
-    self
   end
 
   #
