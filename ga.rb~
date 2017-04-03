@@ -200,10 +200,17 @@ def prealables( les_cours )
   options = get_options([:tous])
   cours = get_cours(ARGV.shift, les_cours)
 
+<<<<<<< HEAD
   prealables = options[:tous] ? get_prealables(cours.prealables, les_cours) : cours.prealables
+=======
+  if options[:tous] && !cours.prealables.empty?
+    prealables = get_prealables(cours.prealables, les_cours)
+  else 
+    prealables = cours.prealables
+  end
+>>>>>>> 6c5c88f224efbd6e225f0c401644dde3707cb91a
 
-  #resultat = prealables.empty? ? nil : 
-  resultat = prealables.flatten.uniq.sort.join("\n") << "\n"
+  resultat = prealables.empty? ? nil : prealables.flatten.uniq.sort.join("\n") << "\n"
 
   [les_cours, resultat]
 end
