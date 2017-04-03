@@ -23,7 +23,7 @@ class Cours
                  "Titre vide: '#{titre}'" )
     DBC.require( nb_credits.to_i > 0,
                  "Nb. credits invalides: #{nb_credits}!?" )
-	  DBC.require( prealables.each {|p| p.kind_of?(Symbol) && Motifs::PREALABLES =~ p }, 
+	  DBC.require( prealables.each {|p| p.kind_of?(Symbol) && Motifs::SIGLE =~ p }, 
 				         "Prealables incorrects: #{prealables}!?" )
     DBC.require( actif.kind_of?(TrueClass) || actif.kind_of?(FalseClass),
                  "Actif incorrect, doit etre true ou false: #{actif}!?" )
@@ -52,7 +52,7 @@ class Cours
                     @prealables.join(separateur_prealables))
     else
       return formater_chaine(le_format, separateur_prealables)
-	  end
+    end
 
     fail "Cas non traite: to_s( #{le_format}, #{separateur_prealables} )"
   end

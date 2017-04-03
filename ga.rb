@@ -157,14 +157,14 @@ def ajouter( les_cours )
 end
 
 def nb_credits( les_cours )
-  total = ARGV.empty? ? 0 : ARGV.map { |sigle| get_cours(sigle, les_cours).nb_credits.to_i }.reduce(:+)
+  total = ARGV.empty? ? 0 : ARGV.map { |sigle| get_cours(sigle, les_cours).nb_credits }.reduce(:+)
   ARGV.clear
   [les_cours, total.to_s << "\n"]
 end
 
 def supprimer( les_cours )
   if ARGV.empty?
-    ARGF.read.scan(/\w+/).map { |sigle| les_cours.delete(get_cours(sigle, les_cours)) }
+    ARGF.read.scan(/\w+/).each { |sigle| les_cours.delete(get_cours(sigle, les_cours)) }
   else
     les_cours.delete(get_cours(ARGV.shift, les_cours))
   end
@@ -202,24 +202,41 @@ def prealables( les_cours )
 
   prealables = options[:tous] ? get_prealables(cours.prealables, les_cours) : cours.prealables
 
-  resultat = prealables.empty? ? nil : prealables.flatten.uniq.sort.join("\n") << "\n"
+  resultat = prealables.empty? ? nil : prealables.uniq.sort.join("\n") << "\n"
 
   [les_cours, resultat]
 end
 
 def get_prealables ( prealables, les_cours )
-  prealables.map { |pre|
+  prealables.flat_map { |pre|
     cours = get_cours( pre.to_s, les_cours )
     cours.prealables.empty? ? pre : get_prealables(cours.prealables, les_cours) << pre
   }
 end
 
-#######################################################
-# Fonctions secondaires
-#######################################################
+####################################################################################################
+#
+#                                       Fonctions secondaires
+#
+####################################################################################################
+
+# Fonction get_options
+# Params: liste de symboles representants les options possibles
+#
+# Retourne un hash { cle: symbole representant l'option, valeur: resultat de valider_option }
+
 def get_options( sym )
   Hash[ sym.map { |sym| [sym, valider_option(/^--#{sym.to_s}/, ARGV[0])] } ]
 end
+
+# Fonction valider_option
+# Params: regex representant l'option, chaine a valider
+#
+# Retourne le resultat de la comparaison entre ARGV[0] et une regex representant l'option attendue
+#
+# valeurs possibles: nil (pas l'option attendue)
+#                    true (option attendue sans parametre ex: --detruire
+#                    string (option attendue avec parametre ex: --depot=.foo.txt retourne ".foo.txt"
 
 def valider_option( attendu, obtenu )
 	if attendu =~ obtenu
@@ -231,34 +248,57 @@ def valider_option( attendu, obtenu )
   end
 end
 
+# Fonction formater_resultat
+# Params: liste de Scours a afficher, hash representant les options specifiees
+#
+# Retourne l'information a afficher sur stdout formatee selon les options specifiees
+
 def formater_resultat(liste_cours, options)
   options[:separateur_prealables] ||= CoursTexte::SEPARATEUR_PREALABLES
 
-  liste_triee = options[:cle_tri] == "titre" ? liste_cours.sort_by(&:titre) : liste_cours.sort_by(&:sigle)
-  liste_triee.map { |cours| cours.to_s(options[:format], options[:separateur_prealables]) }.join("\n") << "\n"
+  (options[:cle_tri] == "titre" ? liste_cours.sort_by(&:titre) : liste_cours.sort_by(&:sigle))
+  .map { |cours| cours.to_s(options[:format], options[:separateur_prealables]) }.join("\n") << "\n"
 end
 
-def creer_cours(data_cours, les_cours)
-  cours = CoursTexte.creer_cours(get_params(data_cours))
-  valider_cours(cours, les_cours)
+# Fonction creer_cours
+# params: liste d'arguments, liste des Cours
+#
+# Retourne les objets Cours crees a partir des arguments fournis
+
+def creer_cours(args, les_cours)
+  valider_cours(CoursTexte.creer_cours(args_to_s(args)), les_cours)
 end
 
-def get_params(data_cours)
-  params = data_cours.shift(3)
-  params << (data_cours.empty? ? nil : data_cours.join(':'))
-  data_cours.clear
-  params.join(',') << ",#{CoursTexte::ACTIF}"
+# Fonction args_to_s
+# Params: liste d'arguments
+# 
+# Retourne la chaine permettant de creer un object Cours a partir des arguments fournis
+
+def args_to_s(args)
+  chaine = args.shift(3) << (args.empty? ? nil : args.join(CoursTexte::SEPARATEUR_PREALABLES)) << CoursTexte::ACTIF
+  args.clear
+  chaine.join(CoursTexte::SEP)
 end
+
+# Fonction valider_cours
+# Params: Cours, liste des Cours
+#
+# Retourne le Cours si il est valide ou signale une erreur
 
 def valider_cours(cours, les_cours)
   erreur "Sigle de motif incorect." unless cours.sigle =~ Motifs::SIGLE
   erreur "Un cours avec le meme sigle existe deja." if les_cours.include? cours
   cours.prealables.each { |pre|
     erreur "Prealable invalide car Sigle incorrect." unless Motifs::SIGLE =~ pre
-    erreur "Prealable invalide car inexistant ou inactif: #{pre}" unless les_cours.any? { |cours| (cours.sigle == pre && cours.actif?) }
+    erreur "Prealable invalide car inexistant: #{pre}" unless les_cours.any? { |cours| cours.sigle == pre && cours.actif? }
   }
   cours
 end
+
+# Fonction get_cours
+# Params: sigle, liste des Cours
+#
+# Retourne l'objet Cours de la liste qui correspond au sigle fourni ou signale une erreur
 
 def get_cours(sigle, les_cours)
   erreur "Format de sigle incorrect: #{sigle}" unless sigle =~ Motifs::SIGLE
